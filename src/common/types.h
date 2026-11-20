@@ -6,41 +6,24 @@
 #include <cstdint>
 
 namespace cvsim {
-    // ===================================
-    // Definições de tipos básicos
-    // ===================================
-
-    // Uma palavra (word) é definida como 32 bits (4 bytes) no RISC-V 32-bit
     using word_t = uint32_t;
     using sword_t = int32_t;
     using inst_t = uint32_t;
 
-    // Uma meia palavra (half-word) é definida como 16 bits (2 bytes)
     using halfword_t = uint16_t;
     using shalfword_t = int16_t;
 
-    // Um byte é definido como 8 bits
     using byte_t = uint8_t;
     using sbyte_t = int8_t;
 
-    // Endereços de memória são representados como palavras de 32 bits
     using addr_t = uint32_t;
 
-    // Endereço de banco de registradores (0 a 31 podem ser descritos com 5 bits, mas usamos 8 bits para alinhamento)
     using reg_addr_t = uint8_t;
 
-    // ===================================
-    // Constantes do processador
-    // ===================================
-
-    constexpr int XLEN = 32;                        // Limite de bits do registrador
-    constexpr int NUM_REGS = 32;                    // Número de registradores gerais
-    constexpr addr_t RESET_VECTOR = 0x80000000;     // Vetor de reset onde PC inicia
-    constexpr addr_t MEM_SIZE = 1024 * 1024;        // Tamanho da memória: 1 MB
-
-    // ===================================
-    // Definições de instruções
-    // ===================================
+    constexpr int XLEN = 32;                        
+    constexpr int NUM_REGS = 32;                    
+    constexpr addr_t RESET_VECTOR = 0x80000000;     
+    constexpr addr_t MEM_SIZE = 1024 * 1024;        
 
     enum class InstrType {
         R_TYPE,
@@ -103,21 +86,17 @@ namespace cvsim {
     };
 
     enum class ALUOp : uint8_t {
-        ADD,    // Soma (ADD, ADDI)
-        SUB,    // Subtração (SUB)
-        AND,    // And bit a bit (AND, ANDI)
-        OR,     // Or bit a bit (OR, ORI)
-        XOR,    // Xor bit a bit (XOR, XORI)
-        SLL,    // Shift left logical (SLL, SLLI)
-        SRL,    // Shift right logical (SRL, SRLI)
-        SRA,    // Shift right arithmetic (SRA, SRAI)
-        SLT,    // Set less than (SLT, SLTI)
-        SLTU    // Set less than unsigned (SLTU, SLTIU)
+        ADD,    
+        SUB,    
+        AND,   
+        OR,     
+        XOR,    
+        SLL,   
+        SRL,    
+        SRA,   
+        SLT,   
+        SLTU    
     };
-
-    // ===================================
-    // Estruturas auxiliares para decode
-    // ===================================
 
     union DecodedInstr {
         struct {
