@@ -32,14 +32,14 @@ graph TD
     WB -.->|Future| PER
 ```
 
-The CPU uses two phases: `eval()` computes next pipeline states using the current state; `commit()` advances the registers and applies register-file/memory writes. The memory model currently has zero wait states and no arbitration. Branches are resolved in EX, with IF/ID flushed on a taken branch or jump. Forwarding is implemented from EX/MEM (except loads) and MEM/WB; a load-use dependency injects one bubble.
+The CPU uses two phases: `eval()` computes next pipeline states using the current state, `commit()` advances the registers and applies register-file/memory writes. The memory model currently has zero wait states and no arbitration. Branches are resolved in EX, with IF/ID flushed on a taken branch or jump. Forwarding is implemented from EX/MEM (except loads) and MEM/WB, a load-use dependency injects one bubble.
 
 ## Features
 
 - **Simulation**: Five-stage, single-issue, in-order pipeline with deterministic evaluate/commit transitions (experimental).
 - **RV32I execution**: ALU register/immediate operations, LUI, AUIPC, jumps, branches, byte/halfword/word loads and stores.
 - **Hazards**: EX/MEM and MEM/WB forwarding, load-use interlock, taken-branch flushing.
-- **Memory**: Byte-addressable, little-endian RAM; checked bounds and alignment; byte strobe writes.
+- **Memory**: Byte-addressable, little-endian RAM, checked bounds and alignment, byte strobe writes.
 - **Statistics**: Cycles, retired instructions, CPI, load-use stall cycles and control redirects.
 - **Tests**: CTest smoke tests for arithmetic, immediates, memory, hazards, branches and jumps.
 
@@ -52,7 +52,7 @@ The CPU uses two phases: `eval()` computes next pipeline states using the curren
 - `0x8000_0000` - `0x800F_FFFF`: RAM, 1 MiB by default (`MEM_SIZE` in `src/common/types.h`).
 - `0x9000_0000` - `0x9FFF_FFFF`: Planned MMIO region (not mapped yet).
 
-The executable loads a **raw little-endian `.bin`** into RAM at `0x8000_0000`. It does not load ELF files. A program must use the correct link/load address and end with `EBREAK` to terminate normally. There is currently no linker script, startup runtime, UART output or operating-system environment.
+The executable loads a raw little-endian `.bin` into RAM at `0x8000_0000`. It does not load ELF files. A program must use the correct link/load address and end with `EBREAK` to terminate normally. There is currently no linker script, startup runtime, UART output or operating-system environment.
 
 ## Project Structure
 
@@ -83,7 +83,7 @@ Run a raw binary (little-endian RV32I, linked at `0x80000000`):
 ./build/Caitsidhe_V path/to/program.bin 100000
 ```
 
-The second argument is an optional maximum number of cycles (default: 1,000,000). Exit code 0 means an `EBREAK` was retired; exit code 2 means the cycle limit was reached; exit code 1 indicates a loading or simulation error. Results include a register dump and summary statistics.
+The second argument is an optional maximum number of cycles (default: 1,000,000). Exit code 0 means an `EBREAK` was retired, exit code 2 means the cycle limit was reached, exit code 1 indicates a loading or simulation error. Results include a register dump and summary statistics.
 
 To run the built-in verification without a RISC-V toolchain:
 
@@ -149,6 +149,6 @@ This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE
 
 ---
 
-<div style='text-align: center;'>
+<div style='text-align: center,'>
   Build with ❤️ and 😸 by André L. Jordão!
 </div>
