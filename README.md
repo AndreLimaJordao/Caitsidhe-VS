@@ -1,3 +1,5 @@
+[![Tests](https://github.com/AndreLimaJordao/Caitsidhe-VS/actions/workflows/tests.yml/badge.svg)](https://github.com/AndreLimaJordao/Caitsidhe-VS/actions/workflows/tests.yml)
+
 # 🐱 Caitsidhe-VS
 
 ![Language](https://img.shields.io/badge/language-C%2B%2B20-blue.svg)
@@ -43,14 +45,14 @@ The CPU uses two phases: `eval()` computes next pipeline states using the curren
 - **Statistics**: Cycles, retired instructions, CPI, load-use stall cycles and control redirects.
 - **Tests**: CTest smoke tests for arithmetic, immediates, memory, hazards, branches and jumps.
 
-**Not yet implemented:** Timed Wishbone protocol (ACK/STALL/ERR), MMIO devices, trace files, CSR/privileged architecture, interrupts, exceptions/traps, `FENCE`/`FENCE.I` behavior, `ECALL`, ISA compliance suites and RTL cycle-by-cycle equivalence. Unsupported instructions cause a simulator error. `EBREAK` (`0x00100073`) is temporarily used as a simulation-stop sentinel instead of a proper breakpoint exception.
+**Not yet implemented:** Timed Wishbone protocol (ACK/STALL/ERR), trace files, CSR/privileged architecture, interrupts, exceptions/traps, `FENCE`/`FENCE.I` behavior, `ECALL`, ISA compliance suites and RTL cycle-by-cycle equivalence. Unsupported instructions cause a simulator error. `EBREAK` (`0x00100073`) is temporarily used as a simulation-stop sentinel instead of a proper breakpoint exception.
 
 ---
 
 ## Memory Map
 
 - `0x8000_0000` - `0x800F_FFFF`: RAM, 1 MiB by default (`MEM_SIZE` in `src/common/types.h`).
-- `0x9000_0000` - `0x9FFF_FFFF`: Planned MMIO region (not mapped yet).
+- `0x9000_0000` - `0x9FFF_FFFF`: Example MMIO addresses; peripherals are explicitly attached via `SoC::attach()` or `Bus::attach()` (not pre-mapped).
 
 The executable loads a raw little-endian `.bin` into RAM at `0x8000_0000`. It does not load ELF files. A program must use the correct link/load address and end with `EBREAK` to terminate normally. There is currently no linker script, startup runtime, UART output or operating-system environment.
 
@@ -61,10 +63,13 @@ src/
 ├── common/         # Base types, ISA fields and bit manipulation utilities
 ├── core/           # ALU, pipeline registers, CPU and register file
 ├── memory/         # Byte-addressable RAM and basic bus
-├── peripherals/    # Placeholder for future UART and MMIO peripherals
+├── peripherals/    # Peripheral contract and register-bank model
+├── platform/       # Easy SoC composition / peripheral attachment
 └── main.cpp        # Raw binary loader, simulation loop and statistics
 tests/
-└── test_cpu.cpp    # Self-contained ISA and pipeline smoke tests
+├── test_cpu.cpp         # Self-contained ISA and pipeline smoke tests
+├── test_peripherals.cpp # CPU-driven MMIO and address map tests
+└── rv32i_program.S      # Independently assembled ISA regression
 ```
 
 ## Getting Started
@@ -152,3 +157,25 @@ This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE
 <div style='text-align: center,'>
   Build with ❤️ and 😸 by André L. Jordão!
 </div>
+## Custom peripherals and architecture
+
+Use `SoC`, `Peripheral` and `RegisterBank` to add user devices without changing
+CPU internals or implementing Wishbone. See [ARCHITECTURE.md](ARCHITECTURE.md)
+for the minimal example, transaction semantics, RTL mapping and official ISA
+test integration roadmap.
+
+When Clang with RISC-V target and `llvm-objcopy` are available, building with
+CMake also assembles a bare-metal RV32I binary and registers a third CTest
+regression. This is a local test, **not** an official RISC-V conformance suite.
+
+## 🧪 Verification and user peripherals (Caitsidhe-VS)
+
+```bash
+python3 tools/run_tests.py
+```
+
+The command compiles, runs available CTest regressions, and writes a case-by-case report in `reports/summary.md`, `results.json` and `ctest.xml`. GitHub Actions publishes the same information as a job summary and artifacts. The badge above indicates **local CI regression only**; **no ACT4 certification is claimed**. Optional compiler-based tests need Clang and llvm-objcopy.
+
+Included zero-wait-state devices: `UART` (TX), `GPIO` and `Timer`, alongside `RegisterBank`. Use `SoC::attach(base, size, peripheral)` instead of modifying the bus internals. The `caitsidhe_elf` executable supports ELF32 RV32 programs, `tohost` termination and `begin_signature`/`end_signature` extraction for experiments; this is **not** yet a complete upstream ACT4 driver.
+
+Guides (Portuguese): [Creating peripherals](docs/PERIPHERALS.pt-BR.md) · [Running tests and CI](docs/TESTING.pt-BR.md) · [Architectural overview](ARCHITECTURE.md).

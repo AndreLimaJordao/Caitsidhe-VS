@@ -1,0 +1,30 @@
+name: Tests
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  linux-tests:
+    name: Linux / C++20 / RV32I regressions
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build clang lld llvm python3
+      - name: Build, test, and produce report
+        run: python3 tools/run_tests.py --build-dir build --report-dir reports
+      - name: Publish test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: caitsidhe-tests-linux
+          path: |
+            reports/summary.md
+            reports/results.json
+            reports/ctest.xml
+          if-no-files-found: warn

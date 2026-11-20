@@ -1,0 +1,7 @@
+/build/
+/reports/
+/.cache/
+/.vscode/
+*.o
+*.elf
+*.bin

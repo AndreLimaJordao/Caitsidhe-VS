@@ -8,6 +8,7 @@
 #include "core/cpu.h"
 #include "memory/ram.h"
 #include "memory/bus.h"
+#include "platform/soc.h"
 
 int main(int argc, char** argv) {
     if (argc < 2 || argc > 3) {
@@ -19,15 +20,16 @@ int main(int argc, char** argv) {
         std::ifstream file(argv[1], std::ios::binary);
         if (!file) throw std::runtime_error("Unable to open binary!");
         const std::vector<uint8_t> program(std::istreambuf_iterator<char>{file}, {});
-        RAM ram(cvsim::MEM_SIZE);
-        ram.load_binary(program, 0);
-        Bus bus(ram);
-        CPU cpu(bus);
+        SoC soc;
+        soc.load(program);
+        CPU& cpu = soc.cpu();
         while (!cpu.is_halted() && cpu.get_stats().cycles < max_cycles) cpu.tick();
         cpu.dump_registers();
         const auto& stats = cpu.get_stats();
-        std::cout << "[CPU] Cycles: " << stats.cycles << " | Retired: " << stats.retired
-                  << " | CPI: " << stats.cpi() << " | Load-use stalls: " << stats.load_use_stalls
+        std::cout << "[CPU] Cycles: " << stats.cycles 
+                  << " | Retired: " << stats.retired
+                  << " | CPI: " << stats.cpi() 
+                  << " | Load-use stalls: " << stats.load_use_stalls
                   << " | Control flushes: " << stats.control_flushes << '\n';
         if (!cpu.is_halted()) {
             std::cerr << "[CPU] Cycle limit reached without EBREAK.\n";

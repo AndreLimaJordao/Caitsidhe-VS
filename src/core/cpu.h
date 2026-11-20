@@ -52,13 +52,20 @@ class CPU {
         static bool is_load(cvsim::inst_t inst) { return opcode(inst) == 0x03; }
         static bool uses_rs1(cvsim::inst_t inst) {
             switch (opcode(inst)) {
-                case 0x03: case 0x13: case 0x23: case 0x33: case 0x63: case 0x67: return true;
+                case 0x03: 
+                case 0x13: 
+                case 0x23: 
+                case 0x33: 
+                case 0x63: 
+                case 0x67: return true;
                 default: return false;
             }
         }
         static bool uses_rs2(cvsim::inst_t inst) {
             switch (opcode(inst)) {
-                case 0x23: case 0x33: case 0x63: return true;
+                case 0x23: 
+                case 0x33: 
+                case 0x63: return true;
                 default: return false;
             }
         }
@@ -191,21 +198,17 @@ class CPU {
             out.valid = true;
             out.result = in.alu_result;
             if (in.memRead || in.memWrite) {
-                const unsigned width = in.funct3 == 0 || in.funct3 == 4 ? 1 :
-                                       in.funct3 == 1 || in.funct3 == 5 ? 2 : 4;
+                const unsigned width = in.funct3 == 0 || in.funct3 == 4 ? 1 : in.funct3 == 1 || in.funct3 == 5 ? 2 : 4;
                 if (in.alu_result % width != 0) throw std::runtime_error("[CPU] Misaligned data access!");
                 if (in.memRead) {
                     const cvsim::addr_t addr = in.alu_result;
-                    cvsim::word_t raw = 0;
-                    for (unsigned i = 0; i < width; ++i)
-                        raw |= cvsim::word_t(bus.read_byte(addr + i)) << (i * 8);
+                    const cvsim::word_t raw = bus.read_access(addr, width);
                     if (in.funct3 == 0) out.result = utils::sign_extend(raw, 8);
                     else if (in.funct3 == 1) out.result = utils::sign_extend(raw, 16);
                     else out.result = raw;
                 } else {
                     // Store happens at commit(), not in combinational evaluation.
-                    const auto aligned = in.alu_result & ~3u;
-                    bus.read(aligned); // Check mapped address and bounds before commit.
+                    bus.validate_write(in.alu_result, width);
                 }
             }
             return out;
@@ -237,9 +240,7 @@ class CPU {
             bool redirect = false;
             cvsim::addr_t target = 0;
             EX_MEM_Next = execute(ID_EX_Curr, redirect, target);
-            const bool stall = ID_EX_Curr.valid && ID_EX_Curr.memRead && ID_EX_Curr.rd != 0 && IF_ID_Curr.valid &&
-                ((uses_rs1(IF_ID_Curr.instruction) && rs1(IF_ID_Curr.instruction) == ID_EX_Curr.rd) ||
-                 (uses_rs2(IF_ID_Curr.instruction) && rs2(IF_ID_Curr.instruction) == ID_EX_Curr.rd));
+            const bool stall = ID_EX_Curr.valid && ID_EX_Curr.memRead && ID_EX_Curr.rd != 0 && IF_ID_Curr.valid && ((uses_rs1(IF_ID_Curr.instruction) && rs1(IF_ID_Curr.instruction) == ID_EX_Curr.rd) || (uses_rs2(IF_ID_Curr.instruction) && rs2(IF_ID_Curr.instruction) == ID_EX_Curr.rd));
             if (redirect) {
                 if (target & 3u) throw std::runtime_error("[CPU] Misaligned branch target!");
                 pc_next = target;
