@@ -1,5 +1,3 @@
-[![Tests](https://github.com/AndreLimaJordao/Caitsidhe-VS/actions/workflows/tests.yml/badge.svg)](https://github.com/AndreLimaJordao/Caitsidhe-VS/actions/workflows/tests.yml)
-
 # 🐱 Caitsidhe-VS
 
 ![Language](https://img.shields.io/badge/language-C%2B%2B20-blue.svg)
@@ -7,6 +5,7 @@
 ![License](https://img.shields.io/badge/license-APACHE_2.0-green.svg)
 ![Build](https://img.shields.io/badge/build-CMake-orange.svg)
 ![Status](https://img.shields.io/badge/status-Active_Development-yellow.svg)
+[![Tests](https://github.com/AndreLimaJordao/Caitsidhe-VS/actions/workflows/tests.yml/badge.svg)](https://github.com/AndreLimaJordao/Caitsidhe-VS/actions/workflows/tests.yml)
 
 **Caitsidhe-VS** (pronounced *Cat-Sith*) is a RISC-V System-on-Chip simulator written in C++ based on Caitsidhe-V RTL designs.
 Caitsidhe-VS is designed to model hardware behavior, including a bus interconnect (Wishbone) and MMIO. It serves as a sandbox playground for experimenting with CPU microarchitectures, hardware accelerators and peripherals.
