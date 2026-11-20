@@ -170,6 +170,3 @@ This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE
 <div style='text-align: center,'>
   Build with ❤️ and 😸 by André L. Jordão!
 </div>
-Included zero-wait-state devices: `UART` (TX), `GPIO` and `Timer`, alongside `RegisterBank`. Use `SoC::attach(base, size, peripheral)` instead of modifying the bus internals. The `caitsidhe_elf` executable supports ELF32 RV32 programs, `tohost` termination and `begin_signature`/`end_signature` extraction for experiments; this is **not** yet a complete upstream ACT4 driver.
-
-Guides (Portuguese): [Creating peripherals](docs/PERIPHERALS.pt-BR.md) · [Running tests and CI](docs/TESTING.pt-BR.md) · [Architectural overview](ARCHITECTURE.md).
