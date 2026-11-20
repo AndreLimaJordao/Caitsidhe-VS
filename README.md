@@ -122,6 +122,19 @@ The current CPU implementation is a baseline model, not a claim that the timing 
 
 ---
 
+## Custom peripherals and architecture
+
+Use `SoC`, `Peripheral` and `RegisterBank` to add user devices without changing
+CPU internals or implementing Wishbone. See [ARCHITECTURE.md](ARCHITECTURE.md)
+for the minimal example, transaction semantics, RTL mapping and official ISA
+test integration roadmap.
+
+When Clang with RISC-V target and `llvm-objcopy` are available, building with
+CMake also assembles a bare-metal RV32I binary and registers a third CTest
+regression. This is a local test, not an official RISC-V conformance suite.
+
+---
+
 ## License
 
 This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE).
@@ -157,25 +170,6 @@ This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE
 <div style='text-align: center,'>
   Build with ❤️ and 😸 by André L. Jordão!
 </div>
-## Custom peripherals and architecture
-
-Use `SoC`, `Peripheral` and `RegisterBank` to add user devices without changing
-CPU internals or implementing Wishbone. See [ARCHITECTURE.md](ARCHITECTURE.md)
-for the minimal example, transaction semantics, RTL mapping and official ISA
-test integration roadmap.
-
-When Clang with RISC-V target and `llvm-objcopy` are available, building with
-CMake also assembles a bare-metal RV32I binary and registers a third CTest
-regression. This is a local test, **not** an official RISC-V conformance suite.
-
-## 🧪 Verification and user peripherals (Caitsidhe-VS)
-
-```bash
-python3 tools/run_tests.py
-```
-
-The command compiles, runs available CTest regressions, and writes a case-by-case report in `reports/summary.md`, `results.json` and `ctest.xml`. GitHub Actions publishes the same information as a job summary and artifacts. The badge above indicates **local CI regression only**; **no ACT4 certification is claimed**. Optional compiler-based tests need Clang and llvm-objcopy.
-
 Included zero-wait-state devices: `UART` (TX), `GPIO` and `Timer`, alongside `RegisterBank`. Use `SoC::attach(base, size, peripheral)` instead of modifying the bus internals. The `caitsidhe_elf` executable supports ELF32 RV32 programs, `tohost` termination and `begin_signature`/`end_signature` extraction for experiments; this is **not** yet a complete upstream ACT4 driver.
 
 Guides (Portuguese): [Creating peripherals](docs/PERIPHERALS.pt-BR.md) · [Running tests and CI](docs/TESTING.pt-BR.md) · [Architectural overview](ARCHITECTURE.md).
