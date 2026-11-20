@@ -19,7 +19,7 @@ The system is designed around the RISC-V RV32I architecture (by now), containing
 graph TD
     subgraph SoC [Caitsidhe-VS]
         CPU[🐱 CPU Core RV32I] 
-        BUS[Interconnect Bus (Wishbone)]
+        BUS[Interconnect Bus Wishbone]
         RAM[Main Memory]
         
         subgraph Peripherals [MMIO Peripherals]
