@@ -7,29 +7,23 @@
 #include "../common/utils.h"
 
 namespace cvsim {
-    cvsim::word_t genImm(cvsim::DecodedInstr decoded, cvsim::InstrType type) {
+    inline word_t genImm(inst_t inst, InstrType type) {
         using namespace utils;
         switch (type) {
-            case cvsim::InstrType::I_TYPE:
-                return sign_extend(decoded.i_type.imm, 12);
-            case cvsim::InstrType::S_TYPE:
-                uint32_t imm = (decoded.s_type.imm11_5 << 5) | decoded.s_type.imm4_0;
-            return sign_extend(imm, 12);
-            case cvsim::InstrType::B_TYPE:
-                uint32_t imm = (get_bit(decoded.b_type.imm12, 0) << 12) |
-                               (decoded.b_type.imm4_1 << 1) |
-                               (decoded.b_type.imm11_5 << 5);
-            return sign_extend(imm, 13);
-            case cvsim::InstrType::U_TYPE:
-                return decoded.u_type.imm31_12 << 12;
-            case cvsim::InstrType::J_TYPE:
-                uint32_t imm = (get_bit(decoded.j_type.imm20, 0) << 20) |
-                               (decoded.j_type.imm10_1 << 1) |
-                               (decoded.j_type.imm11 << 11) |
-                               (decoded.j_type.imm19_12 << 12);
-            return sign_extend(imm, 21);
-            default:
-                return 0;
+            case InstrType::R_TYPE: return 0;
+            case InstrType::I_TYPE:
+                return sign_extend(get_field(inst, 31, 20), 12);
+            case InstrType::S_TYPE:
+                return sign_extend((get_field(inst, 31, 25) << 5) | get_field(inst, 11, 7), 12);
+            case InstrType::B_TYPE:
+                return sign_extend((get_bit(inst, 31) << 12) | (get_bit(inst, 7) << 11) |
+                                   (get_field(inst, 30, 25) << 5) | (get_field(inst, 11, 8) << 1), 13);
+            case InstrType::U_TYPE:
+                return inst & 0xFFFFF000u;
+            case InstrType::J_TYPE:
+                return sign_extend((get_bit(inst, 31) << 20) | (get_field(inst, 19, 12) << 12) |
+                                   (get_bit(inst, 20) << 11) | (get_field(inst, 30, 21) << 1), 21);
         }
+        return 0;
     }
 }

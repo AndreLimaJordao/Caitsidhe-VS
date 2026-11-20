@@ -13,10 +13,10 @@ namespace control {
             static cvsim::ControlSignals getSignals(cvsim::Opcode opcode) {
                 cvsim::ControlSignals signals = {};
                 switch (opcode) {
-                    case cvsim::Opcode::R_TYPE:
+                    case cvsim::Opcode::ALUR:
                         signals = {true, false, false, false, false, false, true, false, cvsim::InstrType::R_TYPE};
                         break;
-                    case cvsim::Opcode::I_TYPE:
+                    case cvsim::Opcode::ALUI:
                         signals = {true, false, false, false, false, true, false, false, cvsim::InstrType::I_TYPE};
                         break;
                     case cvsim::Opcode::LOAD:

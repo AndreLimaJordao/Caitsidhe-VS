@@ -6,30 +6,24 @@
 #include <cstdint>
 
 namespace utils {
-    // Função para extrair um campo de bits de um valor: inst[msb:lsb]
-    // Exemplo: get_field(0xAC, 7, 4) retorna 0xA (1010)
+    // Extract field inst[msb:lsb] (including the full 32-bit width).
     constexpr uint32_t get_field(uint32_t value, int msb, int lsb) {
-        uint32_t mask = ((1u << (msb - lsb + 1)) - 1) << lsb;
-        return (value & mask) >> lsb;
+        const unsigned width = msb - lsb + 1;
+        return (value >> lsb) & (width == 32 ? 0xFFFFFFFFu : ((1u << width) - 1));
     }
 
-    // Função para extrair 1 bit de um valor
-    // Exemplo: get_bit(0xAC, 5) retorna 1
     constexpr uint32_t get_bit(uint32_t value, int bit_pos) {
-        return (value >> bit_pos) & 0x1;
+        return (value >> bit_pos) & 1u;
     }
 
-    // Função de extensão de sinal para um valor com 'bits' bits
-    // Exemplo: sign_extend(0b111, 3) retorna 0xFFFFFFFF
+    // Signed result in two's complement, avoiding signed-shift overflow.
     constexpr int32_t sign_extend(uint32_t value, int bits) {
-        int32_t shift = 32 - bits;
-        return (static_cast<int32_t>(value) << shift) >> shift;
+        const uint32_t mask = bits == 32 ? 0xFFFFFFFFu : (1u << bits) - 1u;
+        const uint32_t sign = 1u << (bits - 1);
+        return static_cast<int32_t>(((value & mask) ^ sign) - sign);
     }
 
-    // Função para combinar bytes em uma palavra (little-endian)
-    // Exemplo: combine_bytes(0x12, 0x34, 0x56, 0x78) retorna 0x12345678
     constexpr uint32_t combine_bytes(uint8_t b3, uint8_t b2, uint8_t b1, uint8_t b0) {
-        return (b3 << 24) | (b2 << 16) | (b1 << 8)  | (b0);
+        return (uint32_t(b3) << 24) | (uint32_t(b2) << 16) | (uint32_t(b1) << 8) | b0;
     }
-
 }

@@ -5,59 +5,46 @@
 #pragma once
 #include "../common/types.h"
 #include <vector>
-#include <cstring>
-#include <iostream>
+#include <stdexcept>
+#include <cstddef>
 
 class RAM {
     private:
-        std::vector<cvsim::word_t> data;
+        std::vector<cvsim::byte_t> data;
 
-    public:
-        RAM(size_t size) {
-            data.resize(size, 0); // Inicializa a RAM com zeros
+        void check(cvsim::addr_t addr, size_t bytes) const {
+            if (addr > data.size() || bytes > data.size() - addr)
+                throw std::out_of_range("[RAM] Address out of bounds!");
         }
 
-        uint32_t size() {
-            return data.size();
+    public:
+        explicit RAM(size_t size) : data(size, 0) {}
+
+        size_t size() const { return data.size(); }
+
+        cvsim::byte_t read_byte(cvsim::addr_t addr) const {
+            check(addr, 1);
+            return data[addr];
         }
 
         cvsim::word_t read_word_aligned(cvsim::addr_t addr) const {
-            if (addr + 4 > data.size()) {
-                std::cerr << "[RAM] Error: Read out of memory bounds at address! ADDR: " << std::hex << addr << std::dec << std::endl;
-                return 0;
-            }
-            if (addr % 4 != 0) {
-                std::cerr << "[RAM] Warning: Reading from unaligned address! ADDR: " << std::hex << addr << std::dec << std::endl;
-            }
-            cvsim::word_t value = 0;
-            // Copia os 4 bytes da RAM para a variável value para o endereço alinhado
-            cvsim::addr_t aligned_addr = addr & ~0x3;
-            std::memcpy(&value, &data[aligned_addr], sizeof(cvsim::word_t));
-            return value;
+            if (addr & 0x3) throw std::runtime_error("[RAM] Unaligned word read!");
+            check(addr, 4);
+            return static_cast<cvsim::word_t>(data[addr]) |
+                   (static_cast<cvsim::word_t>(data[addr + 1]) << 8) |
+                   (static_cast<cvsim::word_t>(data[addr + 2]) << 16) |
+                   (static_cast<cvsim::word_t>(data[addr + 3]) << 24);
         }
 
         void write_word_masked(cvsim::addr_t addr, cvsim::word_t value, uint8_t wstrb) {
-            if (addr + 4 > data.size()) {
-                std::cerr << "[RAM] Error: Write out of memory bounds at address! ADDR: " << std::hex << addr << std::dec << std::endl;
-                return;
-            }
-            if (addr % 4 != 0) {
-                std::cerr << "[RAM] Warning: Writing to unaligned address! ADDR: " << std::hex << addr << std::dec << std::endl;
-            }
-            // Escrita byte a byte com base no wstrb (strobe) para o endereço alinhado
-            cvsim::addr_t aligned_addr = addr & ~0x3;
-            if (wstrb & 0b0001) data[aligned_addr + 0] = (value >> 0) & 0xFF;
-            if (wstrb & 0b0010) data[aligned_addr + 1] = (value >> 8) & 0xFF;
-            if (wstrb & 0b0100) data[aligned_addr + 2] = (value >> 16) & 0xFF;
-            if (wstrb & 0b1000) data[aligned_addr + 3] = (value >> 24) & 0xFF;
+            if (addr & 0x3) throw std::runtime_error("[RAM] Unaligned word write!");
+            check(addr, 4);
+            for (unsigned i = 0; i < 4; ++i)
+                if (wstrb & (1u << i)) data[addr + i] = static_cast<cvsim::byte_t>(value >> (8 * i));
         }
 
-        // Método para carregar um programa na RAM a partir de um vetor de bytes
         void load_binary(const std::vector<uint8_t>& program, cvsim::addr_t start_addr) {
-            if (start_addr + program.size() > data.size()) {
-                std::cerr << "[RAM] Error: Program size exceeds RAM bounds at start address! ADDR: " << std::hex << start_addr << std::dec << std::endl;
-                return;
-            }
-            std::memcpy(&data[start_addr], program.data(), program.size());
+            check(start_addr, program.size());
+            for (size_t i = 0; i < program.size(); ++i) data[start_addr + i] = program[i];
         }
 };

@@ -4,6 +4,7 @@
 
 #pragma once
 #include "../common/types.h"
+#include <iostream>
 
 class ALU {
     public:
