@@ -1,4 +1,4 @@
-# 🐱 Caitsidhe-V SoC (Virtual Implementation)
+# 🐱 Caitsidhe-VS
 
 ![Language](https://img.shields.io/badge/language-C%2B%2B20-blue.svg)
 ![Architecture](https://img.shields.io/badge/arch-RISC--V%20RV32I-red.svg)
@@ -6,8 +6,8 @@
 ![Build](https://img.shields.io/badge/build-CMake-orange.svg)
 ![Status](https://img.shields.io/badge/status-Active_Development-yellow.svg)
 
-**Caitsidhe-V** (pronounced *Cat-Sith*) is a Cycle-Accurate RISC-V System-on-Chip simulator written in C++.
-Caitsidhe-V is designed to **model hardware behavior**, including a bus interconnect and MMIO. It serves as a model for future Verilog implementation and as a sandbox playground for developing hardware accelerators and peripherals.
+**Caitsidhe-V** (pronounced *Cat-Sith*) is a RISC-V System-on-Chip simulator written in C++ based on Caitsidhe-V RTL designs.
+Caitsidhe-V is designed to model hardware behavior, including a bus interconnect (Wishbone) and MMIO. It serves as a model for future Verilog implementation and as a sandbox playground for developing hardware accelerators and peripherals.
 
 ---
 
@@ -35,7 +35,7 @@ graph TD
 ```
 
 ## Features
-- **Cycle-Accurate Simulation**: Models hardware timing and behavior accurately. (On progress)
+- **imulation**: Models hardware timing and behavior accurately. (On progress)
 - **Modular Design**: Easily extendable with new peripherals and accelerators. All components are decoupled classes, mimicking hardware modules.
 - **Bus-Based Interconnect**: Centralized bus for memory and peripheral access.
 - **Trace Logging**: Detailed logging for debugging and analysis.
@@ -79,9 +79,9 @@ Prerequisites:
 ---
 
 ## My development roadmap:
-- [x] Basic Memory (RAM) & Bus Infrastructure
-- [x] Register File & ALU Implementation
-- [x] CPU Core: Fetch & Decode Stages
+- [ ] Basic Memory (RAM) & Bus Infrastructure
+- [ ] Register File & ALU Implementation
+- [ ] CPU Core: Fetch & Decode Stages
 - [ ] CPU Core: Execute & Writeback Logic
 - [ ] Pipeline: Hazard Detection & Forwarding Unit
 - [ ] MMIO: A bunch of peripherals
