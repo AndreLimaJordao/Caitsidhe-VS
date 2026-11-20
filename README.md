@@ -17,7 +17,7 @@ The system is designed around the RISC-V RV32I architecture, containing a CPU Co
 
 ```mermaid
 graph TD
-    subgraph SoC [Caitsidhe-V SoC]
+    subgraph SoC [Caitsidhe-VS]
         CPU[🐱 CPU Core RV32I] 
         BUS[Interconnect Bus]
         RAM[Main Memory]
