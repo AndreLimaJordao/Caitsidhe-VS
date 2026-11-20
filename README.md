@@ -13,13 +13,13 @@ Caitsidhe-V is designed to model hardware behavior, including a bus interconnect
 
 ## Architecture
 
-The system is designed around the RISC-V RV32I architecture, containing a CPU Core, the interconnect bus, a main memory and peripherals.
+The system is designed around the RISC-V RV32I architecture (by now), containing a CPU Core, the interconnect bus, a main memory and peripherals.
 
 ```mermaid
 graph TD
     subgraph SoC [Caitsidhe-VS]
         CPU[🐱 CPU Core RV32I] 
-        BUS[Interconnect Bus]
+        BUS[Interconnect Bus (Wishbone)]
         RAM[Main Memory]
         
         subgraph Peripherals [MMIO Peripherals]
@@ -35,9 +35,9 @@ graph TD
 ```
 
 ## Features
-- **imulation**: Models hardware timing and behavior accurately. (On progress)
+- **Simulation**: Models hardware timing and behavior accurately. (On progress)
 - **Modular Design**: Easily extendable with new peripherals and accelerators. All components are decoupled classes, mimicking hardware modules.
-- **Bus-Based Interconnect**: Centralized bus for memory and peripheral access.
+- **Bus-Based Interconnect**: Centralized Wishbone for memory and peripheral access.
 - **Trace Logging**: Detailed logging for debugging and analysis.
 
 ---
@@ -116,7 +116,7 @@ This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE
   - Peripheral support is minimal at this stage.
 - Q: Why make it "Peripheral-Centric"?
   - Most computers don't task the CPU with everything. Peripherals and hardware accelerators offload specific tasks from the CPU, improving overall system performance and efficiency.
-  - This project aims to provide a platform for experimenting with such peripherals in a cycle-accurate environment without the complexity of HDLs like Verilog.
+  - This project aims to provide a platform for experimenting with such peripherals in a environment without the complexity of HDLs like Verilog.
   - Plus, peripherals are fun to make!
 - Q: Can I contribute?
   - Absolutely! Feel free to open issues or submit pull requests. 
