@@ -12,8 +12,6 @@ Caitsidhe-VS is designed to model hardware behavior, including a bus interconnec
 
 Current status: The five-stage RV32I pipeline runs raw binaries and bare-metal ELFs. The data port models Wishbone Classic with configurable wait states. The command-line board has UART (TX), GPIO, Timer and a CRC32 accelerator. There's also a machine-mode demo, a tool for poking peripherals and a differential test against Unicorn.
 
----
-
 ## Architecture
 
 ```mermaid
@@ -170,8 +168,6 @@ python tools/validate_reference.py --trace run.jsonl --elf my_program.elf
 
 The differential tests check architectural effects. The local Wishbone and firmware tests cover device timing and interrupts. ACT4 and RTL cycle checks are separate milestones.
 
----
-
 ## My development roadmap
 
 - [x] Basic Memory (RAM) & Address Decoding
@@ -195,10 +191,6 @@ The differential tests check architectural effects. The local Wishbone and firmw
 
 The current CPU implementation is a baseline model, not a claim that the timing matches existing Caitsidhe-V RTL revisions.
 
-<<<<<<< HEAD
-=======
----
-
 ## Custom peripherals and architecture
 
 Use `SoC`, `Peripheral` and `RegisterBank` to add user devices without changing
@@ -210,9 +202,6 @@ When Clang with RISC-V target and `llvm-objcopy` are available, building with
 CMake also assembles a bare-metal RV32I binary and registers a third CTest
 regression. This is a local test, not an official RISC-V conformance suite.
 
----
-
->>>>>>> 0d708173fc95e6a9e3c364bded84596f9417f23e
 ## License
 
 This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE).
@@ -240,8 +229,6 @@ This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE
   - **Rule #1:** (Optional but encouraged) YOU MUST CONTRIBUTE WITH CAT MEMES!
 - Q: Which themes you use in VSCode?
   - **Catppuccin-Mocha** and **Fira Code Nerd Font**. (Because cats and fonts matter).
-
----
 
 <div style='text-align: center'>
   Build with ❤️ and 😸 by André L. Jordão!
