@@ -29,19 +29,26 @@ def main():
     ap.add_argument("--report-dir", type=Path, default=ROOT / "reports")
     ap.add_argument("--external-dir", type=Path, help="Optional prebuilt RV32 ELF files; NOT automatically ACT4 certification")
     ap.add_argument("--max-cycles", type=int, default=100000)
+    ap.add_argument("--require-reference", action="store_true", help="Require the Unicorn differential tests")
     args = ap.parse_args()
     build = args.build_dir.resolve()
     report = args.report_dir.resolve()
     report.mkdir(parents=True, exist_ok=True)
     tests = []
-    config = run(["cmake", "-S", str(ROOT), "-B", str(build), "-DCMAKE_BUILD_TYPE=Debug", "-DBUILD_TESTING=ON"])
-    compile_result = run(["cmake", "--build", str(build), "--parallel", "2"]) if config.returncode == 0 else None
+    build_config = "Debug"
+    config = run(["cmake", "-S", str(ROOT), "-B", str(build),
+                  f"-DCMAKE_BUILD_TYPE={build_config}", "-DBUILD_TESTING=ON",
+                  f"-DPython3_EXECUTABLE={sys.executable}",
+                  "-DCAITSIDHE_REQUIRE_REFERENCE=" + ("ON" if args.require_reference else "OFF")])
+    compile_result = run(["cmake", "--build", str(build), "--config", build_config,
+                          "--parallel", "2"]) if config.returncode == 0 else None
     if config.returncode != 0 or compile_result.returncode != 0:
         tests.append({"name": "configure/build", "kind": "build", "status": "FAIL", "detail": "CMake failed"})
     else:
         tests.append({"name": "configure/build", "kind": "build", "status": "PASS", "detail": "Build successful"})
         junit = report / "ctest.xml"
-        proc = run(["ctest", "--test-dir", str(build), "--output-on-failure", "--output-junit", str(junit)])
+        proc = run(["ctest", "--test-dir", str(build), "-C", build_config,
+                    "--output-on-failure", "--output-junit", str(junit)])
         if junit.exists():
             tree = ET.parse(junit)
             for entry in tree.iter("testcase"):
@@ -52,7 +59,10 @@ def main():
                               "detail": "See ctest.xml for output"})
         # Make missing optional toolchains visible instead of silently implying coverage.
         expected_optional = ["caitsidhe_rv32i_binary", "caitsidhe_tohost_pass",
-                             "caitsidhe_signature_match", "caitsidhe_tohost_fail_expected"]
+                             "caitsidhe_signature_match", "caitsidhe_tohost_fail_expected",
+                             "caitsidhe_uart_timer_elf", "caitsidhe_uart_timer_binary",
+                             "caitsidhe_crc32_firmware", "caitsidhe_timer_irq_0",
+                             "caitsidhe_timer_irq_5", "caitsidhe_reference_0", "caitsidhe_reference_5"]
         observed = {t["name"] for t in tests}
         for missing in expected_optional:
             if missing not in observed:
@@ -62,17 +72,22 @@ def main():
             tests.append({"name": "ctest-runner", "kind": "local-ctest", "status": "FAIL", "detail": "CTest returned nonzero"})
         if args.external_dir is not None:
             ext = args.external_dir.resolve()
+            runner_name = "caitsidhe_elf.exe" if os.name == "nt" else "caitsidhe_elf"
+            runner = build / build_config / runner_name
+            if not runner.is_file():
+                runner = build / runner_name
             files = sorted(ext.rglob("*.elf")) if ext.is_dir() else []
             if not files:
                 tests.append({"name": "external ELF selection", "kind": "external-elf", "status": "SKIP", "detail": "No .elf files found"})
             for elf in files:
                 started = time.monotonic()
                 try:
-                    res = subprocess.run([str(build / "caitsidhe_elf"), str(elf), str(args.max_cycles)],
+                    res = subprocess.run([str(runner), str(elf), str(args.max_cycles)],
                                          capture_output=True, text=True, errors="replace", timeout=60)
                     detail = (res.stdout + res.stderr).strip()[-2000:]
                     # EBREAK alone is not a correctness oracle for external tests.
-                    status = "PASS" if res.returncode == 0 and "PASS (tohost=1)" in detail else (
+                    verdict = res.stdout.rstrip().splitlines()[-1:]
+                    status = "PASS" if res.returncode == 0 and verdict == ["RESULT: PASS (tohost=1)"] else (
                         "UNVERIFIED" if res.returncode == 0 else "FAIL")
                 except subprocess.TimeoutExpired:
                     status, detail = "FAIL", "Host execution timeout (60 seconds)"

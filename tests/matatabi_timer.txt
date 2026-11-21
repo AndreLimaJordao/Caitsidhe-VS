@@ -1,0 +1,10 @@
+write 8 1 1
+tick 5
+expect 0 5
+write 8 3 1
+expect 0 0
+tick 2
+expect 0 2
+write 8 0 1
+tick 10
+expect 0 2

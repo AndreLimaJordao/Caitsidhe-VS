@@ -1,0 +1,14 @@
+# CRC-32 of "123456789" is 0xcbf43926.
+expect 4 0
+write 0 0x34333231 0xf
+write 0 0x38373635 0xf
+write 0 0x00003900 0x2
+expect 4 0xcbf43926
+# A CONTROL write to lane 1 leaves the result alone.
+write 8 0x100 0x2
+expect 4 0xcbf43926
+write 8 1 1
+expect 4 0
+# Sparse lane mask feeds just "13", in that order.
+write 0 0x00330031 0x5
+expect 4 0x3854745b

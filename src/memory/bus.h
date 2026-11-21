@@ -10,7 +10,6 @@ namespace MemoryMap {
     constexpr cvsim::addr_t RAM_BASE = cvsim::RESET_VECTOR;
 }
 
-// Zero-wait-state transaction router, not a Wishbone timing implementation
 class Bus {
     struct Region { uint64_t base, end; Peripheral* device; };
     RAM& ram;
@@ -52,6 +51,10 @@ public:
     // Non-side-effecting address check
     void validate_write(cvsim::addr_t address, unsigned bytes) const {
         check(address, bytes);
+    }
+    cvsim::word_t fetch(cvsim::addr_t addr) const {
+        if (!is_ram(addr, 4)) throw std::out_of_range("[Bus] Address not mapped!");
+        return ram.read_word_aligned(addr - MemoryMap::RAM_BASE);
     }
     cvsim::word_t read(cvsim::addr_t addr) const {
         if (addr & 3u) throw std::runtime_error("[Bus] Unaligned word read");

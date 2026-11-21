@@ -3,7 +3,7 @@
 
 // COUNT (+0x00) read-only, COMPARE (+0x04), CONTROL (+0x08)
 // CONTROL bit 0 enables counting; bit 1 resets the counter when written as 1
-// status() indicates count >= compare when compare != 0, no IRQ wire yet
+// When COMPARE is nonzero, count >= compare also raises the interrupt level.
 class Timer : public RegisterBank {
     uint32_t count_ = 0;
 public:
@@ -21,4 +21,5 @@ public:
     }
     void tick() override { if (RegisterBank::read(8) & 1u) ++count_; }
     bool elapsed() const { return RegisterBank::read(4) != 0 && count_ >= RegisterBank::read(4); }
+    bool interrupt_pending() const override { return elapsed(); }
 };

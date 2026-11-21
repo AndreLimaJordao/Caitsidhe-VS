@@ -11,6 +11,7 @@ public:
     virtual ~Peripheral() = default;
     // Optional simulation cycle hook; no-op for purely combinational/register devices.
     virtual void tick() {}
+    virtual bool interrupt_pending() const { return false; }
     virtual cvsim::word_t read(uint32_t offset) const = 0;
     virtual void write(uint32_t offset, cvsim::word_t data, uint8_t wstrb) = 0;
 };

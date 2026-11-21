@@ -13,9 +13,9 @@ class SoC {
     Bus bus_;
     CPU cpu_;
     std::vector<Peripheral*> peripherals_;
+    const Peripheral* timer_interrupt_ = nullptr;
 public:
-    explicit SoC(size_t ram_bytes = cvsim::MEM_SIZE)
-        : memory_(ram_bytes), bus_(memory_), cpu_(bus_) {}
+    explicit SoC(size_t ram_bytes = cvsim::MEM_SIZE, CPU::Options options = {}) : memory_(ram_bytes), bus_(memory_), cpu_(bus_, options) {}
     SoC(const SoC&) = delete;
     SoC& operator=(const SoC&) = delete;
     void attach(cvsim::addr_t base, uint32_t bytes, Peripheral& device) {
@@ -32,7 +32,9 @@ public:
     const Bus& bus() const { return bus_; }
     RAM& ram() { return memory_; }
     const RAM& ram() const { return memory_; }
+    void set_timer_interrupt_source(const Peripheral& device) { timer_interrupt_ = &device; }
     void tick() {
+        if (timer_interrupt_) cpu_.set_timer_interrupt(timer_interrupt_->interrupt_pending());
         cpu_.tick();
         for (auto* peripheral : peripherals_) peripheral->tick();
     }
