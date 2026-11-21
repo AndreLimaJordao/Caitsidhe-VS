@@ -195,6 +195,24 @@ The differential tests check architectural effects. The local Wishbone and firmw
 
 The current CPU implementation is a baseline model, not a claim that the timing matches existing Caitsidhe-V RTL revisions.
 
+<<<<<<< HEAD
+=======
+---
+
+## Custom peripherals and architecture
+
+Use `SoC`, `Peripheral` and `RegisterBank` to add user devices without changing
+CPU internals or implementing Wishbone. See [ARCHITECTURE.md](ARCHITECTURE.md)
+for the minimal example, transaction semantics, RTL mapping and official ISA
+test integration roadmap.
+
+When Clang with RISC-V target and `llvm-objcopy` are available, building with
+CMake also assembles a bare-metal RV32I binary and registers a third CTest
+regression. This is a local test, not an official RISC-V conformance suite.
+
+---
+
+>>>>>>> 0d708173fc95e6a9e3c364bded84596f9417f23e
 ## License
 
 This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE).
