@@ -179,7 +179,7 @@ The differential tests check architectural effects. The local Wishbone and firmw
 - [x] Bus: Wishbone Classic data port with ACK, ERR and wait states
 - [ ] Bus: Wishbone pipelined transfers and arbitration
 - [x] MMIO: UART (TX), timer and GPIO, with a bare-metal UART + Timer demo
-- [x] MMIO: CRC32 accelerator and a firmware example (because peripherals are fun to make!)
+- [x] MMIO: CRC32 accelerator and a firmware example
 - [x] ISA: Machine-mode traps, selected CSRs, FENCE and Timer interrupts
 - [x] Verification: Architectural traces and differential tests against Unicorn
 - [ ] Verification: Cycle comparison with Caitsidhe-V RTL and riscv-arch-test integration
